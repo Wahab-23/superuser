@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 
 //import AddNewPropertyForm from './components/add-new-property/Addnewpropertyform';
-import Testchild from './components/add-new-property/testchild';
 import AddNewPropertyForm from './components/add-new-property/Add-new-property';
 
 const router = createBrowserRouter([
@@ -15,10 +14,6 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      {
-        path: '/child',
-        element: <Testchild />
-      },
       {
         path: '/add-new-property',
         element: <AddNewPropertyForm />

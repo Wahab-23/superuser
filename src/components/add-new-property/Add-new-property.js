@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import './property.css';
 import { Button, Switch, TextField } from '@mui/material';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+
 
 const AddNewPropertyForm = () => {
   const [formData, setFormData] = useState({
-    Image_Link: '',
+    Image_Link: '', //Need image uploader component for this input
     Title: '',
     SubDomain: '',
     p_Group: '',
@@ -15,18 +19,17 @@ const AddNewPropertyForm = () => {
     Location: '',
     Price: '',
     isEnable: false,
-    Overview: '',
+    Overview: '', //need to import jodit here
     Down_Payment: '',
-    Hero_img: '',
-    Logo: '',
-    Key_Highlight: '',
+    Hero_img: '', //Need image uploader component for this input
+    Logo: '', //Need image uploader component for this input
+    Key_Highlight: '', //need multiple switcher for this input
     Downloads: '',
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
-    console.log(e.target.value);
   };
 
   const handleToggle = (e) => {
@@ -35,7 +38,6 @@ const AddNewPropertyForm = () => {
       ...prevData,
       [name]: !prevData[name] // Toggle the value of the property
     }));
-    console.log(formData);
   };
 
   const handleSubmit = (e) => {
@@ -54,43 +56,56 @@ const AddNewPropertyForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <TextField
-        name="Image_Link"
-        label="Image Link"
-        value={formData.Image_Link}
-        onChange={handleChange}
+    <FormGroup onSubmit={handleSubmit} className='form-Container'>
+
+      <FormControlLabel
+        control={
+          <Switch
+            sx={{ m: 1 }}
+            checked={formData.isEnable}
+            name="isEnable"
+            label="isEnable"
+            onClick={handleToggle}
+            value={formData.isEnable}
+          />}
+        label="Is Enable"
       />
+      
       <TextField
         name="Title"
         label="Title"
         value={formData.Title}
         onChange={handleChange}
       />
+
       <TextField
         name="SubDomain"
         label="SubDomain"
         value={formData.SubDomain}
         onChange={handleChange}
       />
+
       <TextField
         name="p_Group"
         label="Group"
         value={formData.p_Group}
         onChange={handleChange}
       />
+
       <TextField
         name="Property_Type"
         label="Property Type"
         value={formData.Property_Type}
         onChange={handleChange}
       />
+
       <TextField
         name="Bedroom"
         label="Bedrooms"
         value={formData.Bedroom}
         onChange={handleChange}
       />
+
       <TextField
         name="Handover_Date"
         label="Handover Date"
@@ -109,47 +124,19 @@ const AddNewPropertyForm = () => {
         value={formData.Location}
         onChange={handleChange}
       />
-      <Switch
-        checked={formData.isEnable}
-        name="isEnable"
-        label="isEnable"
-        onClick={handleToggle}
-        value={formData.isEnable}
-      />
+
       <TextField
-        name="Bedroom"
-        label="Bedrooms"
-        value={formData.Bedroom}
+        name="Down_Payment"
+        label="Down Payment"
+        value={formData.Down_Payment}
         onChange={handleChange}
       />
-      <TextField
-        name="Bedroom"
-        label="Bedrooms"
-        value={formData.Bedroom}
-        onChange={handleChange}
-      />
-      <TextField
-        name="Bedroom"
-        label="Bedrooms"
-        value={formData.Bedroom}
-        onChange={handleChange}
-      />
-      <TextField
-        name="Bedroom"
-        label="Bedrooms"
-        value={formData.Bedroom}
-        onChange={handleChange}
-      />
-      <TextField
-        name="Bedroom"
-        label="Bedrooms"
-        value={formData.Bedroom}
-        onChange={handleChange}
-      />
+      
       <Button type="submit" variant="contained" color="primary">
         Submit
       </Button>
-    </form>
+      
+    </FormGroup>
   );
 };
 

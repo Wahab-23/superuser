@@ -1,0 +1,16 @@
+.form-Container {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    max-width: 500px;
+    min-width: 300px;
+    margin-left: 20px;
+}
+
+.form-Container div {
+    margin: 5px 0px;
+}
+
+.form-Container div input {
+    height: 1rem;
+}
