@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './property.css';
+
+//MUI Imports
 import { Button, Switch, TextField } from '@mui/material';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
 import { blue } from '@mui/material/colors';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+
+//Router Dom Imports
 import { Link } from 'react-router-dom';
 
-
-//Jodit Editor Implemented
+//Components Import
 import { Jodit } from '../SupportingComponents/Jodit';
+import FotoUploader from '../SupportingComponents/FotoUploader';
 
 //Need Image Uploader Component
 
@@ -83,7 +87,7 @@ const AddNewPropertyForm = () => {
       <h1 style={{ textAlign: 'center', marginTop: '5px' }}>Add New Property</h1>
       <FormGroup>
         <FormControlLabel
-          style={{width: '145px'}}
+          style={{width: '150px'}}
           control={
             <Switch
               sx={{ m: 1 }}
@@ -178,7 +182,10 @@ const AddNewPropertyForm = () => {
           <label>Overview</label>
           <Jodit handleOverviewChange={handleOverviewChange} />
         </div>
-
+        
+        <div className="FotoUploader">
+          <FotoUploader />
+        </div>
 
       </FormGroup>
 
