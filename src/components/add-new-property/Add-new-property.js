@@ -21,7 +21,6 @@ import FotoUploader from '../SupportingComponents/FotoUploader';
 
 const AddNewPropertyForm = () => {
   const [formData, setFormData] = useState({
-    Image_Link: '', //Need image uploader component for this input
     Title: '',
     SubDomain: '',
     p_Group: '',
@@ -32,10 +31,11 @@ const AddNewPropertyForm = () => {
     Location: '',
     Price: '',
     isEnable: false,
-    Overview: '', //need to import jodit here
     Down_Payment: '',
-    Hero_img: '', //Need image uploader component for this input
-    Logo: '', //Need image uploader component for this input
+    Overview: '', //need to import jodit here
+    Image_Link: null, //Need image uploader component for this input
+    Hero_img: null, //Need image uploader component for this input
+    Logo: null, //Need image uploader component for this input
     Key_Highlight: '{"LushGreenParks":0,"KidsPlayArea":0,"SwimmingPool":0,"Gymnasium":0,"OutdoorSittingArea":0,"Freehold":0,"Firefighting":0,"ReturnOnInvestment":0,"InternationalAirport":0,"JoggingTrack":0,"SmartHome":0,"TranquilCommunity":0}', //need multiple switcher for this input
     Downloads: '',
   });
@@ -63,6 +63,10 @@ const AddNewPropertyForm = () => {
     });
   };
 
+  const handleiImageChange = (name, file) => {
+    console.log(name, file);
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoading(true);
@@ -81,8 +85,7 @@ const AddNewPropertyForm = () => {
   return (
     <form onSubmit={handleSubmit} className='form-Container'>
       <Link to={`/`} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end'}}>
-        <CloseOutlinedIcon style={{cursor: 'pointer', margin: '0px 5px'}} />
-        <p>Cancel</p>
+        <CloseOutlinedIcon style={{cursor: 'pointer', margin: '0px 5px'}} color='error' />
       </Link>
       <h1 style={{ textAlign: 'center', marginTop: '5px' }}>Add New Property</h1>
       <FormGroup>
@@ -182,12 +185,18 @@ const AddNewPropertyForm = () => {
           <label>Overview</label>
           <Jodit handleOverviewChange={handleOverviewChange} />
         </div>
-        
-        <div className="FotoUploader">
-          <FotoUploader />
-        </div>
 
       </FormGroup>
+      
+      <div className="FotoUploader">
+        <FotoUploader 
+          HeroImg={formData.Hero_img} 
+          LogoImg={formData.Logo} 
+          SmallImg={formData.Image_Link} 
+          handleiImageChange={handleiImageChange}
+        />
+
+      </div>
 
       <Button className='subButton' type="submit" variant="contained" color={button} disabled={loading === true ?true :false}>
         {loading === true

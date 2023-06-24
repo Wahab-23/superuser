@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 
-export default function FotoUploader() {
+export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageChange }) {
   const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     textAlign: 'center',
@@ -23,20 +23,52 @@ export default function FotoUploader() {
 
   const lightTheme = createTheme({ palette: { mode: 'light' } });
 
-  const [logoImage, setLogoImage] = useState(null);
-  const [heroImage, setHeroImage] = useState(null);
-  const [smallImage, setSmallImage] = useState(null);
+  const [logoImage, setLogoImage] = useState(LogoImg);
+  const [heroImage, setHeroImage] = useState(HeroImg);
+  const [smallImage, setSmallImage] = useState(SmallImg);
+  var deleteImage = []
 
-  const handleImageSelect = (event, setImage) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
+  const handleImageSelect = (event, setImage, image) => {
+    if (image === null) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+  
+      reader.onload = (e) => {
+        setImage(e.target.result);
+      };
+  
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    }
 
-    reader.onload = (e) => {
-      setImage(e.target.result);
-    };
+    else if (JSON.stringify(image).includes('http') === true) {
+      deleteImage.push(image);
+      console.log(deleteImage);
 
-    if (file) {
-      reader.readAsDataURL(file);
+      const file = event.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        setImage(e.target.result);
+      };
+
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    }
+
+    else {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+  
+      reader.onload = (e) => {
+        setImage(e.target.result);
+      };
+  
+      if (file) {
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -57,9 +89,9 @@ export default function FotoUploader() {
               gap: 2,
             }}
           >
-            <Item elevation={4} onClick={() => handleItemClick('logo-upload')}>
+            <Item elevation={4} name="Logo" onClick={() => handleItemClick('logo-upload')}>
               {logoImage ? (
-                <img src={logoImage} alt="Logo" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
+                <img src={logoImage} alt="Logo" style={{ width: '90%', height: '90%', objectFit: 'contain' }} />
               ) : (
                 <>
                   <FileUploadRoundedIcon />
@@ -68,9 +100,9 @@ export default function FotoUploader() {
               )}
             </Item>
 
-            <Item elevation={4} onClick={() => handleItemClick('hero-upload')}>
+            <Item elevation={4} name="Hero_img" onClick={() => handleItemClick('hero-upload')}>
               {heroImage ? (
-                <img src={heroImage} alt="Hero" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
+                <img src={heroImage} alt="Hero" style={{ width: '90%', height: '90%', objectFit: 'contain' }} />
               ) : (
                 <>
                   <FileUploadRoundedIcon />
@@ -79,9 +111,9 @@ export default function FotoUploader() {
               )}
             </Item>
 
-            <Item elevation={4} onClick={() => handleItemClick('small-upload')}>
+            <Item elevation={4} name="Image_Link" onClick={() => handleItemClick('small-upload')}>
               {smallImage ? (
-                <img src={smallImage} alt="Small" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
+                <img src={smallImage} alt="Small" style={{ width: '90%', height: '90%', objectFit: 'contain' }} />
               ) : (
                 <>
                   <FileUploadRoundedIcon />
@@ -95,7 +127,7 @@ export default function FotoUploader() {
               type="file"
               accept="image/*"
               style={{ display: 'none' }}
-              onChange={(e) => handleImageSelect(e, setLogoImage)}
+              onChange={(e) => handleImageSelect(e, setLogoImage, logoImage)}
             />
 
             <input
@@ -103,7 +135,7 @@ export default function FotoUploader() {
               type="file"
               accept="image/*"
               style={{ display: 'none' }}
-              onChange={(e) => handleImageSelect(e, setHeroImage)}
+              onChange={(e) => handleImageSelect(e, setHeroImage, heroImage)}
             />
 
             <input
@@ -111,7 +143,7 @@ export default function FotoUploader() {
               type="file"
               accept="image/*"
               style={{ display: 'none' }}
-              onChange={(e) => handleImageSelect(e, setSmallImage)}
+              onChange={(e) => handleImageSelect(e, setSmallImage, smallImage)}
             />
           </Box>
         </ThemeProvider>
