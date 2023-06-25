@@ -18,11 +18,25 @@
     height: 1rem;
 }
 
+.addNewContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 100%;
+}
+
 @media screen and (min-width: 800px) {
     .form-Container {
         padding: 20px;
         filter: drop-shadow(2px 2px 6px #00000056);
         background-color: #fff;
+    }
+}
+
+@media only screen and (max-width: 750px) {
+    .form-Container {
+        width: 95%;
     }
 }
 

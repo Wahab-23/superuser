@@ -6,8 +6,6 @@ import './property.css';
 import { Button, Switch, TextField } from '@mui/material';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import CircularProgress from '@mui/material/CircularProgress';
-import { blue } from '@mui/material/colors';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
 //Router Dom Imports
@@ -19,7 +17,7 @@ import FotoUploader from '../SupportingComponents/FotoUploader';
 
 //Need Image Uploader Component
 
-const AddNewPropertyForm = () => {
+const AddNewPropertyForm = ({loading, handleLoading}) => {
   const [formData, setFormData] = useState({
     Title: '',
     SubDomain: '',
@@ -40,8 +38,17 @@ const AddNewPropertyForm = () => {
     Downloads: '',
   });
 
-  const [loading, setLoading] = useState(false);
   const [button, setButton] = useState("primary");
+
+  const [imagesUpload, setImagesUpload] = useState({
+    Image_Link: null,
+    Hero_img: null,
+    Logo: null,
+  })
+
+  const handleiImageChange = (name, file) => {
+    setImagesUpload((prevData) => ({ ...prevData, [name]: file }))
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,34 +70,67 @@ const AddNewPropertyForm = () => {
     });
   };
 
-  const handleiImageChange = (name, file) => {
-    console.log(name, file);
+  const handleImageUpload = (name, file) => {
+    const formData = new FormData();
+    formData.append('images', file);
+
+    axios.post(`https://superuser.jsons.ae/upload/images?folder=${name}`, formData)
+      .then(response => {
+        setFormData((prevData) => ({...prevData, [name]: response.data[0]}));
+        console.log(response.data[0]); //This has to deleted in production
+      })
+      .catch(error => {
+        setButton("error")
+        console.error(error); //This has to deleted in production
+      });
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    axios
-      .post('/properties-add-new-property', formData)
-      .then((response) => {
-        setLoading(false);
-      })
-      .catch((error) => {
-        setButton('error')
-        setLoading(false);
-      });
+    handleLoading(true);
+  
+    const uploadPromises = [];
+  
+    if (imagesUpload.Image_Link !== formData.Image_Link) {
+      uploadPromises.push(handleImageUpload('Image_Link', imagesUpload.Image_Link));
+    }
+    if (imagesUpload.Hero_img !== formData.Hero_img) {
+      uploadPromises.push(handleImageUpload('Hero_img', imagesUpload.Hero_img));
+    }
+    if (imagesUpload.Logo !== formData.Logo) {
+      uploadPromises.push(handleImageUpload('Logo', imagesUpload.Logo));
+    }
+  
+    try {
+      await Promise.all(uploadPromises);
+  
+      axios.post('https://superuser.jsons.ae/properties-add-new-property', formData)
+        .then((response) => {
+          handleLoading(false);
+        })
+        .catch((error) => {
+          setButton('error')
+          handleLoading(false);
+        });
+    } catch (error) {
+      setButton('error')
+      handleLoading(false);
+      console.error(error);
+    }
   };
 
   return (
+    <div className="addNewContainer">
     <form onSubmit={handleSubmit} className='form-Container'>
-      <Link to={`/`} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end'}}>
-        <CloseOutlinedIcon style={{cursor: 'pointer', margin: '0px 5px'}} color='error' />
-      </Link>
+      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end' }}>
+        <Link to={`/`}>
+          <CloseOutlinedIcon style={{ cursor: 'pointer', margin: '0px 5px' }} color='error' />
+        </Link>
+      </div>
       <h1 style={{ textAlign: 'center', marginTop: '5px' }}>Add New Property</h1>
       <FormGroup>
         <FormControlLabel
-          style={{width: '150px'}}
+          style={{ width: '150px' }}
           control={
             <Switch
               sx={{ m: 1 }}
@@ -187,35 +227,31 @@ const AddNewPropertyForm = () => {
         </div>
 
       </FormGroup>
-      
+
       <div className="FotoUploader">
-        <FotoUploader 
-          HeroImg={formData.Hero_img} 
-          LogoImg={formData.Logo} 
-          SmallImg={formData.Image_Link} 
+        <FotoUploader
+          HeroImg={formData.Hero_img}
+          LogoImg={formData.Logo}
+          SmallImg={formData.Image_Link}
           handleiImageChange={handleiImageChange}
         />
 
       </div>
 
-      <Button className='subButton' type="submit" variant="contained" color={button} disabled={loading === true ?true :false}>
-        {loading === true
+      <Button className='subButton' type="submit" variant="contained" color={button} disabled={loading === true ? true : false}>
+        { button === 'error'
           ?
-            <CircularProgress sx={{ color: blue[50], }} />
+          "error"
           :
-            button === 'error'
+          button === 'success'
             ?
-              "error"
+            "Submitted"
             :
-              button === 'success'
-              ?
-                "Submitted"
-              :
-                "Submit"
+            "Submit"
         }
-
       </Button>
     </form>
+    </div>
   );
 };
 
