@@ -10,6 +10,7 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 
 //Router Dom Imports
 import { Link } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 //Components Import
 import { Jodit } from '../SupportingComponents/Jodit';
@@ -39,6 +40,8 @@ const AddNewPropertyForm = ({loading, handleLoading}) => {
   });
 
   const [button, setButton] = useState("primary");
+
+  const navigate = useNavigate();
 
   const [imagesUpload, setImagesUpload] = useState({
     Image_Link: null,
@@ -107,6 +110,7 @@ const AddNewPropertyForm = ({loading, handleLoading}) => {
       axios.post('https://superuser.jsons.ae/properties-add-new-property', formData)
         .then((response) => {
           handleLoading(false);
+          navigate(`/edit-property/${response.data.id}`);        //This is where we are using navigator
         })
         .catch((error) => {
           setButton('error')
