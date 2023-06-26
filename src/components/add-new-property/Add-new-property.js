@@ -35,9 +35,9 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
     isEnable: false,
     Down_Payment: '',
     Overview: '', 
-    Image_Link: 'null', 
-    Hero_img: 'null', 
-    Logo: 'null', 
+    Image_Link: null, 
+    Hero_img: null, 
+    Logo: null, 
     Key_Highlight: '{"LushGreenParks":0,"KidsPlayArea":0,"SwimmingPool":0,"Gymnasium":0,"OutdoorSittingArea":0,"Freehold":0,"Firefighting":0,"ReturnOnInvestment":0,"InternationalAirport":0,"JoggingTrack":0,"SmartHome":0,"TranquilCommunity":0}', //need multiple switcher for this input
     Downloads: '',
     Gallery: '',  //Need Photo Uploader that can upload multiple photos
@@ -87,14 +87,15 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
     });
   };
 
-  const handleImageUpload = (name, folder, file) => {
+  console.log(formData);
+  const handleImageUpload = (name, file) => {
     const formData = new FormData();
     formData.append('images', file);
 
-    axios.post(`https://superuser.jsons.ae/upload/images?folder=${folder}`, formData)
+    axios.post(`https://superuser.jsons.ae/upload/images?folder=${name}`, formData)
       .then(response => {
-        setFormData((prevData) => ({ ...prevData, [name]: response.data[0] }));
-        console.log(response.data[0]); //This has to deleted in production
+        setFormData((prevData) => ({ ...prevData, [name]: response.data[0] }))
+        console.log(response.data); //This has to deleted in production
       })
       .catch(error => {
         setButton("error")
@@ -109,13 +110,13 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
     const uploadPromises = [];
 
     if (imagesUpload.Image_Link !== formData.Image_Link) {
-      uploadPromises.push(handleImageUpload('Image_Link', JSON.stringify(formData.SubDomain).replace(/[^a-zA-Z0-9]/g, '-').replace(/\s+/g, '-').toLowerCase() , imagesUpload.Image_Link));
+      uploadPromises.push(handleImageUpload('Image_Link', imagesUpload.Image_Link));
     }
     if (imagesUpload.Hero_img !== formData.Hero_img) {
-      uploadPromises.push(handleImageUpload('Hero_img', JSON.stringify(formData.SubDomain).replace(/[^a-zA-Z0-9]/g, '-').replace(/\s+/g, '-').toLowerCase(), imagesUpload.Hero_img));
+      uploadPromises.push(handleImageUpload('Hero_img', imagesUpload.Hero_img));
     }
     if (imagesUpload.Logo !== formData.Logo) {
-      uploadPromises.push(handleImageUpload('Logo', JSON.stringify(formData.SubDomain).replace(/[^a-zA-Z0-9]/g, '-').replace(/\s+/g, '-').toLowerCase(), imagesUpload.Logo));
+      uploadPromises.push(handleImageUpload('Logo', imagesUpload.Logo));
     }
 
     try {
@@ -140,7 +141,7 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
 
   return (
     <div className="addNewContainer">
-      {shouldNavigate() && <Navigate to={`/edit-property/${propertyId}`} replace={true} />}
+      {/* {shouldNavigate() && <Navigate to={`/edit-property/${propertyId}`} replace={true} />} */}
       <form onSubmit={handleSubmit} className='form-Container'>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end' }}>
           <Link to={`/`}>
@@ -166,11 +167,7 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
           <TextField
             name="SubDomain"
             label="SubDomain"
-            value={JSON.stringify(formData.SubDomain.trim())
-                    .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters except whitespace
-                    .replace(/\s+/g, '-') // Replace whitespace with '-'
-                    .toLowerCase()
-                  }
+            value={formData.SubDomain}
             onChange={handleChange}
             required
           />
