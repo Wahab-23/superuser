@@ -7,10 +7,11 @@ import { Button, Switch, TextField } from '@mui/material';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
+import Divider from '@mui/material/Divider';
 
 //Router Dom Imports
 import { Link } from 'react-router-dom';
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 //Components Import
 import { Jodit } from '../SupportingComponents/Jodit';
@@ -18,10 +19,12 @@ import FotoUploader from '../SupportingComponents/FotoUploader';
 
 //Need Image Uploader Component
 
-const AddNewPropertyForm = ({loading, handleLoading}) => {
+const AddNewPropertyForm = ({ loading, handleLoading }) => {
   const [formData, setFormData] = useState({
     Title: '',
+    Tag_Line: '',
     SubDomain: '',
+    Size: '',
     p_Group: '',
     Property_Type: '',
     Bedroom: '',
@@ -31,17 +34,29 @@ const AddNewPropertyForm = ({loading, handleLoading}) => {
     Price: '',
     isEnable: false,
     Down_Payment: '',
-    Overview: '', //need to import jodit here
-    Image_Link: null, //Need image uploader component for this input
-    Hero_img: null, //Need image uploader component for this input
-    Logo: null, //Need image uploader component for this input
+    Overview: '', 
+    Image_Link: 'null', 
+    Hero_img: 'null', 
+    Logo: 'null', 
     Key_Highlight: '{"LushGreenParks":0,"KidsPlayArea":0,"SwimmingPool":0,"Gymnasium":0,"OutdoorSittingArea":0,"Freehold":0,"Firefighting":0,"ReturnOnInvestment":0,"InternationalAirport":0,"JoggingTrack":0,"SmartHome":0,"TranquilCommunity":0}', //need multiple switcher for this input
     Downloads: '',
+    Gallery: '',  //Need Photo Uploader that can upload multiple photos
+    meta_Title: '',
+    meta_Description: '',
+    meta_Keyword: '',
   });
 
   const [button, setButton] = useState("primary");
+  const [propertyId, setPropertyId] = useState(null)
 
-  const navigate = useNavigate();
+  const shouldNavigate = () => {
+    if (propertyId !== null) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  };
 
   const [imagesUpload, setImagesUpload] = useState({
     Image_Link: null,
@@ -58,12 +73,11 @@ const AddNewPropertyForm = ({loading, handleLoading}) => {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleToggle = (e) => {
-    const { name } = e.target;
+  const handleToggle = () => {
     setFormData((prevData) => ({
       ...prevData,
-      [name]: !prevData[name] // Toggle the value of the property 
-    }))
+      isEnable: prevData.isEnable === 1 ? 0 : 1 // Toggle between 1 and 0
+    }));
   };
 
   const handleOverviewChange = (newOverview) => {
@@ -73,13 +87,13 @@ const AddNewPropertyForm = ({loading, handleLoading}) => {
     });
   };
 
-  const handleImageUpload = (name, file) => {
+  const handleImageUpload = (name, folder, file) => {
     const formData = new FormData();
     formData.append('images', file);
 
-    axios.post(`https://superuser.jsons.ae/upload/images?folder=${name}`, formData)
+    axios.post(`https://superuser.jsons.ae/upload/images?folder=${folder}`, formData)
       .then(response => {
-        setFormData((prevData) => ({...prevData, [name]: response.data[0]}));
+        setFormData((prevData) => ({ ...prevData, [name]: response.data[0] }));
         console.log(response.data[0]); //This has to deleted in production
       })
       .catch(error => {
@@ -91,26 +105,27 @@ const AddNewPropertyForm = ({loading, handleLoading}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     handleLoading(true);
-  
+
     const uploadPromises = [];
-  
+
     if (imagesUpload.Image_Link !== formData.Image_Link) {
-      uploadPromises.push(handleImageUpload('Image_Link', imagesUpload.Image_Link));
+      uploadPromises.push(handleImageUpload('Image_Link', JSON.stringify(formData.SubDomain).replace(/[^a-zA-Z0-9]/g, '-').replace(/\s+/g, '-').toLowerCase() , imagesUpload.Image_Link));
     }
     if (imagesUpload.Hero_img !== formData.Hero_img) {
-      uploadPromises.push(handleImageUpload('Hero_img', imagesUpload.Hero_img));
+      uploadPromises.push(handleImageUpload('Hero_img', JSON.stringify(formData.SubDomain).replace(/[^a-zA-Z0-9]/g, '-').replace(/\s+/g, '-').toLowerCase(), imagesUpload.Hero_img));
     }
     if (imagesUpload.Logo !== formData.Logo) {
-      uploadPromises.push(handleImageUpload('Logo', imagesUpload.Logo));
+      uploadPromises.push(handleImageUpload('Logo', JSON.stringify(formData.SubDomain).replace(/[^a-zA-Z0-9]/g, '-').replace(/\s+/g, '-').toLowerCase(), imagesUpload.Logo));
     }
-  
+
     try {
       await Promise.all(uploadPromises);
-  
+
       axios.post('https://superuser.jsons.ae/properties-add-new-property', formData)
         .then((response) => {
           handleLoading(false);
-          navigate(`/edit-property/${response.data.id}`);        //This is where we are using navigator
+          console.log(`/edit-property/${response.data.id}`);
+          setPropertyId(response.data.id)   //This is where we are using navigator
         })
         .catch((error) => {
           setButton('error')
@@ -125,136 +140,186 @@ const AddNewPropertyForm = ({loading, handleLoading}) => {
 
   return (
     <div className="addNewContainer">
-    <form onSubmit={handleSubmit} className='form-Container'>
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end' }}>
-        <Link to={`/`}>
-          <CloseOutlinedIcon style={{ cursor: 'pointer', margin: '0px 5px' }} color='error' />
-        </Link>
-      </div>
-      <h1 style={{ textAlign: 'center', marginTop: '5px' }}>Add New Property</h1>
-      <FormGroup>
-        <FormControlLabel
-          style={{ width: '150px' }}
-          control={
-            <Switch
-              sx={{ m: 1 }}
-              checked={formData.isEnable}
-              name="isEnable"
-              label="isEnable"
-              onClick={handleToggle}
-              value={formData.isEnable}
-            />}
-          label="Is Enable"
-        />
+      {shouldNavigate() && <Navigate to={`/edit-property/${propertyId}`} replace={true} />}
+      <form onSubmit={handleSubmit} className='form-Container'>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end' }}>
+          <Link to={`/`}>
+            <CloseOutlinedIcon style={{ cursor: 'pointer', margin: '0px 5px' }} color='error' />
+          </Link>
+        </div>
+        <h1 style={{ textAlign: 'center', marginTop: '5px' }}>Add New Property</h1>
+        <FormGroup>
+          <FormControlLabel
+            style={{ width: '150px' }}
+            control={
+              <Switch
+                sx={{ m: 1 }}
+                checked={formData.isEnable === 1}
+                name="isEnable"
+                label="isEnable"
+                onClick={handleToggle}
+                value={formData.isEnable}
+              />}
+            label="Is Enable"
+          />
 
-        <TextField
-          name="Title"
-          label="Title"
-          value={formData.Title}
-          onChange={handleChange}
-          required
-        />
+          <TextField
+            name="SubDomain"
+            label="SubDomain"
+            value={JSON.stringify(formData.SubDomain.trim())
+                    .replace(/[^a-zA-Z0-9\s]/g, '') // Remove special characters except whitespace
+                    .replace(/\s+/g, '-') // Replace whitespace with '-'
+                    .toLowerCase()
+                  }
+            onChange={handleChange}
+            required
+          />
 
-        <TextField
-          name="SubDomain"
-          label="SubDomain"
-          value={formData.SubDomain}
-          onChange={handleChange}
-          required
-        />
+          <TextField
+            name="Title"
+            label="Title"
+            value={formData.Title}
+            onChange={handleChange}
+            required
+          />
 
-        <TextField
-          name="p_Group"
-          label="Group"
-          value={formData.p_Group}
-          onChange={handleChange}
-          required
-        />
+          <TextField
+            name="Tag_Line"
+            label="Tag Line"
+            value={formData.Tag_Line}
+            onChange={handleChange}
+          />
 
-        <TextField
-          name="Property_Type"
-          label="Property Type"
-          value={formData.Property_Type}
-          onChange={handleChange}
-          required
-        />
+          <TextField
+            name="p_Group"
+            label="Group"
+            value={formData.p_Group}
+            onChange={handleChange}
+            required
+          />
 
-        <TextField
-          name="Bedroom"
-          label="Bedrooms"
-          value={formData.Bedroom}
-          onChange={handleChange}
-          required
-        />
+          <TextField
+            name="Property_Type"
+            label="Property Type"
+            value={formData.Property_Type}
+            onChange={handleChange}
+            required
+          />
+          
+          <TextField
+            name="Size"
+            label="Size"
+            value={formData.Size}
+            onChange={handleChange}
+            required
+          />
 
-        <TextField
-          name="Handover_Date"
-          label="Handover Date"
-          value={formData.Handover_Date}
-          onChange={handleChange}
-          required
-        />
-        <TextField
-          name="Payment_Plan"
-          label="Payment Plan"
-          value={formData.Payment_Plan}
-          onChange={handleChange}
-          required
-        />
-        <TextField
-          name="Location"
-          label="Location"
-          value={formData.Location}
-          onChange={handleChange}
-          required
-        />
+          <TextField
+            name="Bedroom"
+            label="Bedrooms"
+            value={formData.Bedroom}
+            onChange={handleChange}
+            required
+          />
 
-        <TextField
-          name="Price"
-          label="Price"
-          value={formData.Price}
-          onChange={handleChange}
-          required
-        />
+          <TextField
+            name="Price"
+            label="Starting Price"
+            value={formData.Price}
+            onChange={handleChange}
+            required
+          />
 
-        <TextField
-          name="Down_Payment"
-          label="Down Payment"
-          value={formData.Down_Payment}
-          onChange={handleChange}
-          required
-        />
+          <TextField
+            name="Payment_Plan"
+            label="Payment Plan"
+            value={formData.Payment_Plan}
+            onChange={handleChange}
+            required
+          />
 
-        <div style={{ marginTop: '10px' }}>
-          <label>Overview</label>
-          <Jodit handleOverviewChange={handleOverviewChange} />
+          <TextField
+            name="Handover_Date"
+            label="Handover Date"
+            value={formData.Handover_Date}
+            onChange={handleChange}
+            required
+          />
+
+          <TextField
+            name="Location"
+            label="Location"
+            value={formData.Location}
+            onChange={handleChange}
+            required
+          />
+
+
+          <TextField
+            name="Down_Payment"
+            label="Down Payment"
+            value={formData.Down_Payment}
+            onChange={handleChange}
+            required
+          />
+          <Divider>Overview</Divider>
+          <div style={{ marginTop: '10px' }}>
+            <Jodit handleOverviewChange={handleOverviewChange} />
+          </div>
+          
+          <Divider>Meta Section</Divider>
+          
+          <TextField
+            name="meta_Title"
+            label="Meta Title"
+            value={formData.meta_Title}
+            onChange={handleChange}
+            required
+          />
+
+          <TextField
+            name="meta_Description"
+            label="Meta Description"
+            value={formData.meta_Description}
+            onChange={handleChange}
+            required
+          />
+
+          <TextField
+            name="meta_Keyword"
+            label="Meta Keyword"
+            value={formData.meta_Keyword}
+            onChange={handleChange}
+            required
+          />
+          
+        </FormGroup>
+
+        <Divider>Images Section</Divider>
+
+        <div className="FotoUploader">
+          <FotoUploader
+            HeroImg={formData.Hero_img}
+            LogoImg={formData.Logo}
+            SmallImg={formData.Image_Link}
+            handleiImageChange={handleiImageChange}
+          />
+
         </div>
 
-      </FormGroup>
-
-      <div className="FotoUploader">
-        <FotoUploader
-          HeroImg={formData.Hero_img}
-          LogoImg={formData.Logo}
-          SmallImg={formData.Image_Link}
-          handleiImageChange={handleiImageChange}
-        />
-
-      </div>
-
-      <Button className='subButton' type="submit" variant="contained" color={button} disabled={loading === true ? true : false}>
-        { button === 'error'
-          ?
-          "error"
-          :
-          button === 'success'
+        <Button className='subButton' type="submit" variant="contained" color={button} disabled={loading === true ? true : false}>
+          {button === 'error'
             ?
-            "Submitted"
+            "error"
             :
-            "Submit"
-        }
-      </Button>
-    </form>
+            button === 'success'
+              ?
+              "Submitted"
+              :
+              "Submit"
+          }
+        </Button>
+      </form>
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { useState } from 'react';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import EditProperty from './components/edit-property/Edit-property';
 
 
 function App() {
@@ -24,6 +25,10 @@ function App() {
     {
       path: '/add-new-property',
       element: <AddNewPropertyForm loading={loading} handleLoading={handleLoading} /> 
+    },
+    {
+      path: '/edit-property/:id',
+      element: <EditProperty loading={loading} handleLoading={handleLoading} /> 
     }
   ])
 

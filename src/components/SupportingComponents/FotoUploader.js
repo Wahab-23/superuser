@@ -87,7 +87,7 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
 
           <Grid xs={12} sx={{ p: 1 }}>
               <Item elevation={4} onClick={() => handleItemClick('hero-upload')}>
-                {heroImage ? (
+                {heroImage !== "null" ? (
                   <img src={heroImage} alt="Hero" style={{ width: '90%', height: '90%', objectFit: 'contain' }} />
                 ) : (
                   <>
@@ -100,7 +100,7 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
 
             <Grid xs={6} sx={{ p: 1 }}>
               <Item elevation={4} onClick={() => handleItemClick('logo-upload')}>
-                {logoImage ? (
+                {logoImage !== "null" ? (
                   <img src={logoImage} alt="Logo" style={{ width: '90%', height: '90%', objectFit: 'contain' }} />
                 ) : (
                   <>
@@ -113,7 +113,7 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
 
             <Grid xs={6} sx={{ p: 1 }}>
               <Item elevation={4} onClick={() => handleItemClick('small-upload')}>
-                {smallImage ? (
+                {smallImage !== "null" ? (
                   <img src={smallImage} alt="Small" style={{ width: '90%', height: '90%', objectFit: 'contain' }} />
                 ) : (
                   <>
@@ -123,7 +123,6 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
                 )}
               </Item>
             </Grid>
-
             <input
               id="logo-upload"
               name="Logo"
