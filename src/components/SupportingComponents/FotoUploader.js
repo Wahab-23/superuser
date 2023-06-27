@@ -30,7 +30,9 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
 
   const handleImageSelect = (event, setImage, image) => {
     if (image === null) {
+      const name = event.target.name;
       const file = event.target.files[0];
+      handleiImageChange(name, file);
       const reader = new FileReader();
   
       reader.onload = (e) => {
@@ -46,7 +48,9 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
       deleteImage.push(image);
       console.log(deleteImage);
 
+      const name = event.target.name;
       const file = event.target.files[0];
+      handleiImageChange(name, file);
       const reader = new FileReader();
 
       reader.onload = (e) => {
@@ -123,6 +127,7 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
             </Item>
 
             <input
+              name='Logo'
               id="logo-upload"
               type="file"
               accept="image/*"
@@ -131,6 +136,7 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
             />
 
             <input
+              name='Hero_img'
               id="hero-upload"
               type="file"
               accept="image/*"
@@ -139,6 +145,7 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
             />
 
             <input
+              name='Image_Link'
               id="small-upload"
               type="file"
               accept="image/*"

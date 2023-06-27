@@ -34,10 +34,10 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
     Price: '',
     isEnable: false,
     Down_Payment: '',
-    Overview: '', 
-    Image_Link: null, 
-    Hero_img: null, 
-    Logo: null, 
+    Overview: '',
+    Image_Link: null,
+    Hero_img: null,
+    Logo: null,
     Key_Highlight: '{"LushGreenParks":0,"KidsPlayArea":0,"SwimmingPool":0,"Gymnasium":0,"OutdoorSittingArea":0,"Freehold":0,"Firefighting":0,"ReturnOnInvestment":0,"InternationalAirport":0,"JoggingTrack":0,"SmartHome":0,"TranquilCommunity":0}', //need multiple switcher for this input
     Downloads: '',
     Gallery: '',  //Need Photo Uploader that can upload multiple photos
@@ -78,6 +78,8 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
       ...prevData,
       isEnable: prevData.isEnable === 1 ? 0 : 1 // Toggle between 1 and 0
     }));
+    console.log(imagesUpload);
+    console.log(formData);
   };
 
   const handleOverviewChange = (newOverview) => {
@@ -87,53 +89,87 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
     });
   };
 
-  console.log(formData);
-  const handleImageUpload = (name, file) => {
+  const handleImageUpload = async (name, folder, file) => {
     const formData = new FormData();
     formData.append('images', file);
 
-    axios.post(`https://superuser.jsons.ae/upload/images?folder=${name}`, formData)
-      .then(response => {
-        setFormData((prevData) => ({ ...prevData, [name]: response.data[0] }))
-        console.log(response.data); //This has to deleted in production
-      })
-      .catch(error => {
-        setButton("error")
-        console.error(error); //This has to deleted in production
-      });
-  }
+    try {
+      const response = await axios.post(
+        `https://superuser.jsons.ae/upload/images?folder=${folder}`,
+        formData
+      );
+      console.log(response); // This has to be deleted in production
+      return response.data; // Assuming the response itself is an array
+    } catch (error) {
+      console.error(error); // This has to be deleted in production
+      throw error;
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     handleLoading(true);
 
-    const uploadPromises = [];
-
-    if (imagesUpload.Image_Link !== formData.Image_Link) {
-      uploadPromises.push(handleImageUpload('Image_Link', imagesUpload.Image_Link));
-    }
-    if (imagesUpload.Hero_img !== formData.Hero_img) {
-      uploadPromises.push(handleImageUpload('Hero_img', imagesUpload.Hero_img));
-    }
-    if (imagesUpload.Logo !== formData.Logo) {
-      uploadPromises.push(handleImageUpload('Logo', imagesUpload.Logo));
-    }
-
     try {
-      await Promise.all(uploadPromises);
+      const uploadPromises = [];
+      const updatedFormData = { ...formData }; // Create a copy of the formData
 
-      axios.post('https://superuser.jsons.ae/properties-add-new-property', formData)
-        .then((response) => {
-          handleLoading(false);
-          console.log(`/edit-property/${response.data.id}`);
-          setPropertyId(response.data.id)   //This is where we are using navigator
-        })
-        .catch((error) => {
-          setButton('error')
-          handleLoading(false);
+      if (imagesUpload.Image_Link !== formData.Image_Link) {
+        const imageLinkPromise = handleImageUpload(
+          'Image_Link',
+          JSON.stringify(formData.SubDomain.trim())
+            .replace(/[^a-zA-Z0-9\s]/g, '')
+            .replace(/\s+/g, '-')
+            .toLowerCase(),
+          imagesUpload.Image_Link
+        ).then((response) => {
+          updatedFormData.Image_Link = response[0]; // Update the copy of formData
         });
+        uploadPromises.push(imageLinkPromise);
+      }
+
+      if (imagesUpload.Hero_img !== formData.Hero_img) {
+        const HeroImgData = handleImageUpload(
+          'Hero_img',
+          JSON.stringify(formData.SubDomain.trim())
+            .replace(/[^a-zA-Z0-9\s]/g, '')
+            .replace(/\s+/g, '-')
+            .toLowerCase(),
+          imagesUpload.Hero_img
+        ).then((response) => {
+          updatedFormData.Hero_img = response[0]; // Update the copy of formData
+        });
+        uploadPromises.push(HeroImgData);
+      }
+
+      if (imagesUpload.Logo !== formData.Logo) {
+        const LogoData = handleImageUpload(
+          'Logo',
+          JSON.stringify(formData.SubDomain.trim())
+            .replace(/[^a-zA-Z0-9\s]/g, '')
+            .replace(/\s+/g, '-')
+            .toLowerCase(),
+          imagesUpload.Logo
+        ).then((response) => {
+          updatedFormData.Logo = response[0]; // Update the copy of formData
+        });
+        uploadPromises.push(LogoData);
+      }
+
+      await Promise.all(uploadPromises); // Wait for all handleImageUpload promises to resolve
+
+      console.log(formData);
+
+      const response = await axios.post(
+        'https://superuser.jsons.ae/properties-add-new-property',
+        updatedFormData // Use the updated copy of formData
+      );
+
+      handleLoading(false);
+      console.log(`/edit-property/${response.data.id}`);
+      setPropertyId(response.data.id);
     } catch (error) {
-      setButton('error')
+      setButton('error');
       handleLoading(false);
       console.error(error);
     }
@@ -141,7 +177,7 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
 
   return (
     <div className="addNewContainer">
-      {/* {shouldNavigate() && <Navigate to={`/edit-property/${propertyId}`} replace={true} />} */}
+      {shouldNavigate() && <Navigate to={`/edit-property/${propertyId}`} replace={true} />}
       <form onSubmit={handleSubmit} className='form-Container'>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end' }}>
           <Link to={`/`}>
@@ -202,7 +238,7 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
             onChange={handleChange}
             required
           />
-          
+
           <TextField
             name="Size"
             label="Size"
@@ -263,9 +299,9 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
           <div style={{ marginTop: '10px' }}>
             <Jodit handleOverviewChange={handleOverviewChange} />
           </div>
-          
+
           <Divider>Meta Section</Divider>
-          
+
           <TextField
             name="meta_Title"
             label="Meta Title"
@@ -289,7 +325,7 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
             onChange={handleChange}
             required
           />
-          
+
         </FormGroup>
 
         <Divider>Images Section</Divider>

@@ -11,6 +11,7 @@ import { useState } from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import EditProperty from './components/edit-property/Edit-property';
+import FileManager from './components/File-Manager/Filemanager';
 
 
 function App() {
@@ -29,6 +30,10 @@ function App() {
     {
       path: '/edit-property/:id',
       element: <EditProperty loading={loading} handleLoading={handleLoading} /> 
+    },
+    {
+      path: '/file-manager',
+      element: <FileManager loading={loading} handleLoading={handleLoading} /> 
     }
   ])
 
