@@ -16,6 +16,7 @@ import { Navigate } from "react-router-dom";
 //Components Import
 import { Jodit } from '../SupportingComponents/Jodit';
 import FotoUploader from '../SupportingComponents/FotoUploader';
+import MFU from '../SupportingComponents/mutipleFotoUploader';
 
 //Need Image Uploader Component
 
@@ -63,7 +64,7 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
     Hero_img: null,
     Logo: null,
   })
-
+  
   const handleiImageChange = (name, file) => {
     setImagesUpload((prevData) => ({ ...prevData, [name]: file }))
   }
@@ -295,12 +296,12 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
             onChange={handleChange}
             required
           />
-          <Divider>Overview</Divider>
+          <Divider className='divider'>Overview</Divider>
           <div style={{ marginTop: '10px' }}>
             <Jodit handleOverviewChange={handleOverviewChange} />
           </div>
 
-          <Divider>Meta Section</Divider>
+          <Divider className='divider'>Meta Section</Divider>
 
           <TextField
             name="meta_Title"
@@ -328,7 +329,7 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
 
         </FormGroup>
 
-        <Divider>Images Section</Divider>
+        <Divider className='divider'>Images Section</Divider>
 
         <div className="FotoUploader">
           <FotoUploader
@@ -337,8 +338,11 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
             SmallImg={formData.Image_Link}
             handleiImageChange={handleiImageChange}
           />
-
         </div>
+
+        <Divider className='divider'>Gallery</Divider>
+
+        <MFU Gallery={formData.Gallery} />
 
         <Button className='subButton' type="submit" variant="contained" color={button} disabled={loading === true ? true : false}>
           {button === 'error'

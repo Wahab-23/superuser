@@ -49,5 +49,9 @@
 form button.subButton {
     height: 40px;
     width: 20%;
-    min-width: 100px;
+    min-width: fit-content;
+}
+
+.css-1puturl-MuiDivider-root {
+    margin: 20px 0px !important;
 }

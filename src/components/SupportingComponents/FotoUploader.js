@@ -86,10 +86,10 @@ export default function FotoUploader({ HeroImg, LogoImg, SmallImg, handleiImageC
         <ThemeProvider theme={lightTheme}>
           <Box
             sx={{
-              p: 2,
+              p: 1,
               bgcolor: 'background.default',
               display: 'grid',
-              gridTemplateColumns: { md: '1fr 1fr 1fr' },
+              gridTemplateColumns: 'repeat(3, 1fr)' ,
               gap: 2,
             }}
           >

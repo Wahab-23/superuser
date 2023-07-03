@@ -17,6 +17,7 @@ import { useParams } from 'react-router-dom';
 //Components Import
 import { Jodit } from '../SupportingComponents/Jodit';
 import FotoUploader from '../SupportingComponents/FotoUploader';
+import GalleryUploader from '../SupportingComponents/mutipleFotoUploader';
 
 //Need Image Uploader Component
 
@@ -85,6 +86,7 @@ const EditProperty = ({ loading, handleLoading }) => {
           Logo: propertyData[0].Logo || '',
           Key_Highlight: propertyData[0].Key_Highlight || '',
           Downloads: propertyData[0].Downloads || '',
+          Gallery: propertyData[0].Gallery || '',
           meta_Title: propertyData[0].meta_Title || '',
           meta_Description: propertyData[0].meta_Description || '',
           meta_Keyword: propertyData[0].meta_Keyword || ''
@@ -120,6 +122,7 @@ const EditProperty = ({ loading, handleLoading }) => {
       ...prevData,
       isEnable: prevData.isEnable === 1 ? 0 : 1 // Toggle between 1 and 0
     }));
+    console.log(JSON.stringify(formData.Gallery));
   };
 
   const handleOverviewChange = (newOverview) => {
@@ -379,6 +382,10 @@ const EditProperty = ({ loading, handleLoading }) => {
           />
 
         </div>
+        
+        <Divider className='divider'>Gallery</Divider>
+
+        <GalleryUploader Gallery={formData.Gallery} />
 
         <Button className='subButton' type="submit" variant="contained" color={button} disabled={loading === true ? true : false}>
           {button === 'error'
