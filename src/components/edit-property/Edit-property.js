@@ -102,6 +102,15 @@ const EditProperty = ({ loading, handleLoading }) => {
       });
   }, [id, setFormData]);
 
+  useEffect(() => {
+    if (formData.SubDomain === '') {
+      handleLoading(true);
+    }
+    else {
+      handleLoading(false);
+    }
+  })
+
   const [imagesUpload, setImagesUpload] = useState({
     Image_Link: null,
     Hero_img: null,

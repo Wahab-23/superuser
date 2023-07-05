@@ -82,15 +82,13 @@ export default function GalleryUploader({ Gallery }) {
             }}
           >
             {galleryImages.map((image, index) => (
-              <Item elevation={4} key={index}>
+              <Item elevation={4} key={index} style={{cursor: 'unset'}}>
                 <img
                   src={image}
                   alt={`${index + 1}`}
                   style={{ width: '90%', height: '60%', objectFit: 'contain', marginBottom: '5px' }}
                 />
-                <button onClick={() => handleRemoveImage(index)} style={{cursor: 'pointer'}}>
-                  <DeleteIcon />
-                </button>
+                <DeleteIcon onClick={() => handleRemoveImage(index)} style={{cursor: 'pointer'}} color='error' />
               </Item>
             ))}
 
@@ -100,7 +98,7 @@ export default function GalleryUploader({ Gallery }) {
               style={{ cursor: 'pointer' }}
             >
               <FileUploadRoundedIcon />
-              <p>Add Image</p>
+              <p>Add Images</p>
             </Item>
 
             <input
