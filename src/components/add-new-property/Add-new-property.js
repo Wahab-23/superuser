@@ -10,8 +10,7 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import Divider from '@mui/material/Divider';
 
 //Router Dom Imports
-import { Link } from 'react-router-dom';
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 //Components Import
 import { Jodit } from '../SupportingComponents/Jodit';
@@ -46,6 +45,11 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
     meta_Description: '',
     meta_Keyword: '',
   });
+
+  const navigate = useNavigate();
+  const goBack = () => {
+    navigate(-1);
+  }
 
   const [button, setButton] = useState("primary");
   const [propertyId, setPropertyId] = useState(null)
@@ -181,9 +185,7 @@ const AddNewPropertyForm = ({ loading, handleLoading }) => {
       {shouldNavigate() && <Navigate to={`/edit-property/${propertyId}`} replace={true} />}
       <form onSubmit={handleSubmit} className='form-Container'>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end' }}>
-          <Link to={`/`}>
-            <CloseOutlinedIcon style={{ cursor: 'pointer', margin: '0px 5px' }} color='error' />
-          </Link>
+          <CloseOutlinedIcon style={{ cursor: 'pointer', margin: '0px 5px' }} color='error' onClick={goBack} />
         </div>
         <h1 style={{ textAlign: 'center', marginTop: '5px' }}>Add New Property</h1>
         <FormGroup>

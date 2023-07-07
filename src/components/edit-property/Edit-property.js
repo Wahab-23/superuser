@@ -10,9 +10,7 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import Divider from '@mui/material/Divider';
 
 //Router Dom Imports
-import { Link } from 'react-router-dom';
-//import { Navigate } from "react-router-dom";
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 //Components Import
 import { Jodit } from '../SupportingComponents/Jodit';
@@ -49,6 +47,12 @@ const EditProperty = ({ loading, handleLoading }) => {
   });
 
   const [button, setButton] = useState("primary");
+
+  const navigate = useNavigate();
+  const goBack = () => {
+    navigate(-1);
+  }
+
 
   // const shouldNavigate = () => {
   //   if (propertyId !== null) {
@@ -119,6 +123,13 @@ const EditProperty = ({ loading, handleLoading }) => {
 
   const handleiImageChange = (name, file) => {
     setImagesUpload((prevData) => ({ ...prevData, [name]: file }))
+  }
+
+  const [GalleryUploads, setGalleryUploads] = useState([])
+
+  const handleGalleryChange = (files) => {
+    setGalleryUploads(prevData => [ ...prevData, files]);
+    console.log(GalleryUploads);
   }
 
   const handleChange = (e) => {
@@ -231,9 +242,7 @@ const EditProperty = ({ loading, handleLoading }) => {
       {/* {shouldNavigate() && <Navigate to={`/edit-property/${propertyId}`} replace={true} />} */}
       <form onSubmit={handleSubmit} className='form-Container'>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', color: 'black', textDecoration: 'none', justifyContent: 'flex-end' }}>
-          <Link to={`/`}>
-            <CloseOutlinedIcon style={{ cursor: 'pointer', margin: '0px 5px' }} color='error' />
-          </Link>
+          <CloseOutlinedIcon style={{ cursor: 'pointer', margin: '0px 5px' }} color='error' onClick={goBack} />
         </div>
         <h1 style={{ textAlign: 'center', marginTop: '5px' }}>Edit Property</h1>
         <FormGroup>
@@ -394,7 +403,7 @@ const EditProperty = ({ loading, handleLoading }) => {
         
         <Divider className='divider'>Gallery</Divider>
 
-        <GalleryUploader Gallery={formData.Gallery} />
+        <GalleryUploader Gallery={formData.Gallery} handleGalleryChange={handleGalleryChange} />
 
         <Button className='subButton' type="submit" variant="contained" color={button} disabled={loading === true ? true : false}>
           {button === 'error'

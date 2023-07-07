@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // MUI Imports
 import Grid from '@mui/material/Grid';
@@ -8,7 +8,7 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import FileUploadRoundedIcon from '@mui/icons-material/FileUploadRounded';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-export default function GalleryUploader({ Gallery }) {
+export default function GalleryUploader({ Gallery, handleGalleryChange }) {
   const Item = styled(Paper)(({ theme }) => ({
     ...theme.typography.body2,
     textAlign: 'center',
@@ -26,15 +26,36 @@ export default function GalleryUploader({ Gallery }) {
 
   const [galleryImages, setGalleryImages] = useState([]);
   const [deleteImages, setDeleteImages] = useState([]);
+  const [filesUploader, setFilesUploader] = useState([]);
+  const [actionPerformed, setActionPerformed] = useState(false);
 
-  Gallery 
-    ?console.log(Gallery) 
-    :console.log('nothing in Gallery') 
-  ;
+  useEffect(() => {
+    if (Gallery) {
+      try {
+        const galleryArray = JSON.parse(Gallery);
+        setGalleryImages(prevImages => [...prevImages, ...galleryArray]);
+      } catch (error) {
+        console.error("Error parsing Gallery JSON:", error);
+      }
+    }
+  }, [Gallery, setGalleryImages]);
+
+  useEffect(() => {
+    if (actionPerformed) {
+      console.log(filesUploader[0]);
+    }
+  }, [filesUploader, actionPerformed]);
+
+  useEffect(() => {
+    if (actionPerformed) {
+      console.log(deleteImages);
+    }
+  }, [deleteImages, actionPerformed]);
 
   const handleImageSelect = (event) => {
     const files = event.target.files;
     const uploadedImages = [];
+    setFilesUploader(prevData => [...prevData, files]);
   
     const loadImage = (file) => {
       return new Promise((resolve) => {
@@ -57,15 +78,16 @@ export default function GalleryUploader({ Gallery }) {
   
       setGalleryImages((prevImages) => [...prevImages, ...uploadedImages]);
     };
-  
-    loadImages();
+    loadImages()
+    setActionPerformed(true);
   };
-
+  
   const handleRemoveImage = (index) => {
     const imageToRemove = galleryImages[index];
     setDeleteImages((prevImages) => [...prevImages, imageToRemove]);
     setGalleryImages((prevImages) => prevImages.filter((_, i) => i !== index));
-    console.log(deleteImages);
+    setFilesUploader(prevImages => prevImages.filter((_, i) => i !== index));
+    setActionPerformed(true);
   };
 
   return (
