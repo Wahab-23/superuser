@@ -125,12 +125,14 @@ const EditProperty = ({ loading, handleLoading }) => {
     setImagesUpload((prevData) => ({ ...prevData, [name]: file }))
   }
 
-  const [GalleryUploads, setGalleryUploads] = useState([])
+  const GalleryUploads = [];
 
-  const handleGalleryChange = (files) => {
-    setGalleryUploads(prevData => [ ...prevData, files]);
+  const handleGalleryChange = async (files) => {
+    await files.forEach(file => {
+            GalleryUploads.push(file);
+          });
     console.log(GalleryUploads);
-  }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;

@@ -28,12 +28,14 @@ export default function GalleryUploader({ Gallery, handleGalleryChange }) {
   const [deleteImages, setDeleteImages] = useState([]);
   const [filesUploader, setFilesUploader] = useState([]);
   const [actionPerformed, setActionPerformed] = useState(false);
+  const [urlImages, setUrlImages] = useState(null);
 
   useEffect(() => {
     if (Gallery) {
       try {
         const galleryArray = JSON.parse(Gallery);
         setGalleryImages(prevImages => [...prevImages, ...galleryArray]);
+        setUrlImages(galleryArray);
       } catch (error) {
         console.error("Error parsing Gallery JSON:", error);
       }
@@ -42,53 +44,77 @@ export default function GalleryUploader({ Gallery, handleGalleryChange }) {
 
   useEffect(() => {
     if (actionPerformed) {
-      console.log(filesUploader[0]);
+      console.log(filesUploader);
     }
   }, [filesUploader, actionPerformed]);
 
-  useEffect(() => {
-    if (actionPerformed) {
-      console.log(deleteImages);
-    }
-  }, [deleteImages, actionPerformed]);
+  // useEffect(() => {
+  //   if (actionPerformed) {
+  //     console.log(deleteImages);
+  //   }
+  // }, [deleteImages, actionPerformed]);
 
   const handleImageSelect = (event) => {
     const files = event.target.files;
     const uploadedImages = [];
-    setFilesUploader(prevData => [...prevData, files]);
   
-    const loadImage = (file) => {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-  
-        reader.onload = (e) => {
-          resolve(e.target.result);
-        };
-  
-        reader.readAsDataURL(file);
-      });
-    };
-  
-    const loadImages = async () => {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const image = await loadImage(file);
-        uploadedImages.push(image);
+    // Define a Promise wrapper
+    const handleImageSelectPromise = new Promise((resolve) => {
+      if (files[0] !== undefined) {
+        setFilesUploader((prevData) => [...prevData, ...files]);
       }
   
-      setGalleryImages((prevImages) => [...prevImages, ...uploadedImages]);
-    };
-    loadImages()
-    setActionPerformed(true);
-  };
+      const loadImage = (file) => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
   
+          reader.onload = (e) => {
+            resolve(e.target.result);
+          };
+  
+          reader.readAsDataURL(file);
+        });
+      };
+  
+      const loadImages = async () => {
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const image = await loadImage(file);
+          uploadedImages.push(image);
+        }
+        setGalleryImages((prevImages) => [...prevImages, ...uploadedImages]);
+  
+        // Resolve the Promise once the first function is complete
+        resolve();
+      };
+  
+      loadImages();
+    });
+  
+    // Execute the second function after the first function has completed
+    handleImageSelectPromise.then(() => {
+      handleGalleryChange(filesUploader);
+    });
+  };
+
   const handleRemoveImage = (index) => {
     const imageToRemove = galleryImages[index];
-    setDeleteImages((prevImages) => [...prevImages, imageToRemove]);
+    if (imageToRemove.includes('https')) {
+      setDeleteImages((prevImages) => [...prevImages, imageToRemove]);
+    }
     setGalleryImages((prevImages) => prevImages.filter((_, i) => i !== index));
-    setFilesUploader(prevImages => prevImages.filter((_, i) => i !== index));
-    setActionPerformed(true);
+    const urlImagesCount = urlImages.length;
+    setFilesUploader((prevImages) => prevImages.filter((_, i) => i !== index - urlImagesCount));
   };
+
+  const logData = () => {
+    setActionPerformed(true);
+  }
+
+  const logGallery = () => {
+    const urlImagesCount = urlImages.length;
+    console.log(urlImagesCount);
+  }
 
   return (
     <div>
@@ -104,13 +130,13 @@ export default function GalleryUploader({ Gallery, handleGalleryChange }) {
             }}
           >
             {galleryImages.map((image, index) => (
-              <Item elevation={4} key={index} style={{cursor: 'unset'}}>
+              <Item elevation={4} key={index} style={{ cursor: 'unset' }}>
                 <img
                   src={image}
                   alt={`${index + 1}`}
                   style={{ width: '90%', height: '60%', objectFit: 'contain', marginBottom: '5px' }}
                 />
-                <DeleteIcon onClick={() => handleRemoveImage(index)} style={{cursor: 'pointer'}} color='error' />
+                <DeleteIcon onClick={() => handleRemoveImage(index)} style={{ cursor: 'pointer' }} color='error' />
               </Item>
             ))}
 
@@ -134,6 +160,8 @@ export default function GalleryUploader({ Gallery, handleGalleryChange }) {
           </Box>
         </ThemeProvider>
       </Grid>
+      <h2 onClick={logData}>Log Data</h2>
+      <p onClick={logGallery}>Log Gallery</p>
     </div>
   );
 }
